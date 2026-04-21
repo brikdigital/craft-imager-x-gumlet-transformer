@@ -7,9 +7,12 @@ use Craft;
 use craft\base\Event;
 use craft\base\Model;
 use craft\base\Plugin;
+use craft\elements\Asset;
+use craft\events\DefineAssetUrlEvent;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
+use gumlet\imagetransformer\services\Gumlet as GumletService;
 use spacecatninja\imagerx\events\RegisterTransformersEvent;
 use spacecatninja\imagerx\ImagerX;
 
@@ -42,10 +45,42 @@ class GumletTransformer extends Plugin {
                 $event->transformers['gumlet'] = Gumlet::class;
             }
         );
+
+        if ($this->getSettings()->hookCpImages) {
+            Event::on(
+                Asset::class,
+                Asset::EVENT_BEFORE_DEFINE_URL,
+                function (DefineAssetUrlEvent $event) {
+                    /** @var Asset $asset */
+                    $asset = $event->sender;
+                    $transform = $event->transform;
+                    $gumlet = new GumletService();
+
+                    $baseUrl = $asset->volume->fs->subfolder . '/' . $asset->path;
+                    $params = $gumlet->buildParams($transform);
+
+                    if (empty($params)) {
+                        $event->url = $baseUrl;
+                        return;
+                    }
+
+                    $event->url =  "https://{$this->getSettings()->subdomain}.gumlet.io/$baseUrl?" . http_build_query($params);
+                    $event->handled = true;
+                }
+            );
+        }
     }
 
     protected function createSettingsModel(): ?Model
     {
         return new Settings();
+    }
+
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->view->rendertemplate(
+            "$this->handle/settings",
+            ['settings' => $this->getSettings()]
+        );
     }
 }

@@ -38,9 +38,9 @@ class Gumlet extends Component implements TransformerInterface
         $settings = GumletTransformer::$plugin->getSettings();
         $config = ImagerService::getConfig();
 
-        if (empty($settings->baseUrl)) throw new ImagerException("No baseUrl defined for Gumlet transformer");
+        if (empty($settings->subdomain)) throw new ImagerException("No subdomain defined for Gumlet transformer");
 
-        $urlSegments = [rtrim($settings->baseUrl, "/"), $image->fs->subfolder, $image->path];
+        $urlSegments = ["https://$settings->subdomain.gumlet.io", $image->fs->subfolder, $image->path];
         $url = implode('/', $urlSegments);
 
         $query = [];
