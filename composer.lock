@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "695de106d06ca17120694f5590a304f1",
+    "content-hash": "91df5f4760cfdebd58e21f9b419578a8",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2255,69 +2255,6 @@
                 "source": "https://github.com/grpc/grpc-php/tree/v1.80.0"
             },
             "time": "2026-03-30T09:22:39+00:00"
-        },
-        {
-            "name": "gumlet/craft-gumlet-imagetransformer",
-            "version": "1.5.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/akbansa/craft-gumlet-imagetransformer.git",
-                "reference": "15e40984ce22ddbb701ea40e833f25f20816dc14"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/akbansa/craft-gumlet-imagetransformer/zipball/15e40984ce22ddbb701ea40e833f25f20816dc14",
-                "reference": "15e40984ce22ddbb701ea40e833f25f20816dc14",
-                "shasum": ""
-            },
-            "require": {
-                "craftcms/cms": "^4.0.0|^5.0.0",
-                "php": "^8.0.2"
-            },
-            "require-dev": {
-                "craftcms/ecs": "dev-main"
-            },
-            "type": "craft-plugin",
-            "extra": {
-                "name": "Gumlet",
-                "class": "gumlet\\imagetransformer\\Plugin",
-                "handle": "gumlet-imagetransformer",
-                "developer": "Anshul Bansal",
-                "changelogUrl": "https://raw.githubusercontent.com/akbansa/craft-gumlet-imagetransformer/main/CHANGELOG.md",
-                "developerUrl": "https://github.com/akbansa",
-                "documentationUrl": "https://github.com/akbansa/craft-gumlet-imagetransformer"
-            },
-            "autoload": {
-                "psr-4": {
-                    "gumlet\\imagetransformer\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anshul Bansal",
-                    "homepage": "https://github.com/akbansa"
-                }
-            ],
-            "description": "Gumlet image transformer for Craft CMS",
-            "keywords": [
-                "Craft",
-                "cms",
-                "craftcms",
-                "gumlet",
-                "image",
-                "plugin",
-                "transform"
-            ],
-            "support": {
-                "docs": "https://github.com/akbansa/craft-gumlet-imagetransformer",
-                "issues": "https://github.com/akbansa/craft-gumlet-imagetransformer/issues",
-                "source": "https://github.com/akbansa/craft-gumlet-imagetransformer/tree/1.5.3"
-            },
-            "time": "2026-01-12T11:53:32+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

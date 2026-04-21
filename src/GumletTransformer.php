@@ -2,6 +2,7 @@
 
 namespace brikdigital\gumlettransformer;
 
+use brikdigital\gumlettransformer\helpers\GumletHelpers;
 use brikdigital\gumlettransformer\jobs\PurgeGumletCacheJob;
 use brikdigital\gumlettransformer\models\Settings;
 use Craft;
@@ -14,7 +15,6 @@ use craft\events\ModelEvent;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
-use gumlet\imagetransformer\services\Gumlet as GumletService;
 use spacecatninja\imagerx\events\RegisterTransformersEvent;
 use spacecatninja\imagerx\ImagerX;
 
@@ -58,10 +58,9 @@ class GumletTransformer extends Plugin {
                     /** @var Asset $asset */
                     $asset = $event->sender;
                     $transform = $event->transform;
-                    $gumlet = new GumletService();
 
                     $baseUrl = $asset->volume->fs->subfolder . '/' . $asset->path;
-                    $params = $gumlet->buildParams($transform);
+                    $params = GumletHelpers::buildParams($transform);
 
                     if (empty($params)) {
                         $event->url = $baseUrl;
