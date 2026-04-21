@@ -1,6 +1,9 @@
 <?php
 
+namespace brikdigital\gumlettransformer;
+
 use brikdigital\gumlettransformer\models\Settings;
+use Craft;
 use craft\base\Event;
 use craft\base\Model;
 use craft\base\Plugin;
@@ -21,10 +24,10 @@ class GumletTransformer extends Plugin {
 
         self::$plugin = $this;
 
-        Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+        Craft::$app->log->targets[] = new MonologTarget([
             'name' => 'gumlet-transformer',
             'categories' => ['gumlet-transformer'],
-            'level' => LogLevel::ERROR,
+            'level' => LogLevel::INFO,
             'logContext' => false,
             'formatter' => new LineFormatter(
                 "%datetime% [%channel%.%level_name%] [%extra.yii_category%] %message%\n\n",
