@@ -1,0 +1,30 @@
+{% import '_includes/forms.twig' as forms %}
+
+<style>
+    .field:first-of-type {
+        margin-top: 0;
+    }
+</style>
+
+{{ forms.autosuggestField({
+    label: "Gumlet Subdomain",
+    name: "subdomain",
+    suggestEnvVars: true,
+    value: settings.subdomain,
+    required: true
+}) }}
+
+{{ forms.autosuggestField({
+    label: "API Key",
+    name: "apiKey",
+    suggestEnvVars: true,
+    value: settings.apiKey,
+    required: true
+}) }}
+
+{{ forms.checkbox({
+    label: "Use Gumlet in Control Panel",
+    name: "hookCpImages",
+    checked: settings.hookCpImages,
+    required: false
+}) }}
