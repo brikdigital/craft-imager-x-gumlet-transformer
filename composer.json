@@ -1,0 +1,48 @@
+{
+    "name": "brikdigital/craft-imager-x-gumlet-transformer",
+    "description": "Gumlet transformer for Imager X.",
+    "type": "craft-plugin",
+    "version": "5.0.0",
+    "license": "MPL-2.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "image",
+        "responsive",
+        "transform",
+        "srcset",
+        "picture",
+        "gumlet"
+    ],
+    "authors": [
+        {
+            "name": "Alyxia Sother",
+            "email": "alyxia@riseup.net"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "craftcms/cms": "^5.0.0",
+        "spacecatninja/imager-x": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "brikdigital\\gumlettransformer\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "craftcms/plugin-installer": true,
+            "yiisoft/yii2-composer": true
+        }
+    },
+    "extra": {
+        "name": "Imager X Gumlet Transformer",
+        "handle": "imager-x-gumlet-transformer",
+        "schemaVersion": "5.0.0",
+        "hasCpSettings": true,
+        "class": "brikdigital\\gumlettransformer\\GumletTransformer"
+    }
+}
