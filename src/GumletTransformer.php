@@ -2,6 +2,7 @@
 
 namespace brikdigital\gumlettransformer;
 
+use brikdigital\gumlettransformer\jobs\PurgeGumletCacheJob;
 use brikdigital\gumlettransformer\models\Settings;
 use Craft;
 use craft\base\Event;
@@ -9,6 +10,7 @@ use craft\base\Model;
 use craft\base\Plugin;
 use craft\elements\Asset;
 use craft\events\DefineAssetUrlEvent;
+use craft\events\ModelEvent;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
@@ -51,6 +53,8 @@ class GumletTransformer extends Plugin {
                 Asset::class,
                 Asset::EVENT_BEFORE_DEFINE_URL,
                 function (DefineAssetUrlEvent $event) {
+                    if (!Craft::$app->request->isCpRequest) return;
+
                     /** @var Asset $asset */
                     $asset = $event->sender;
                     $transform = $event->transform;
@@ -69,6 +73,28 @@ class GumletTransformer extends Plugin {
                 }
             );
         }
+
+        Event::on(
+            Asset::class,
+            Asset::EVENT_AFTER_SAVE,
+            function (ModelEvent $event) {
+                /** @var Asset $asset */
+                $asset = $event->sender;
+                /** @var Settings $settings */
+                $settings = $this->getSettings();
+
+                if ($asset->kind !== 'image') {
+                    return;
+                }
+
+                $imagePath = $asset->volume->fs->subfolder . '/' . $asset->path;
+                Craft::$app->queue->push(new PurgeGumletCacheJob([
+                    'gumletSubdomain' => $settings->subdomain,
+                    'apiKey' => $settings->apiKey,
+                    'imagePath' => $imagePath,
+                ]));
+            }
+        );
     }
 
     protected function createSettingsModel(): ?Model
