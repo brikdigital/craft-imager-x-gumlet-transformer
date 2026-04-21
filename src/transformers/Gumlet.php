@@ -2,11 +2,14 @@
 
 namespace brikdigital\gumlettransformer\transformers;
 
-use Craft;
+use brikdigital\gumlettransformer\GumletTransformer;
+use brikdigital\gumlettransformer\models\GumletTransformedImageModel;
+use brikdigital\gumlettransformer\models\Settings;
 use craft\base\Component;
 use craft\elements\Asset;
-use Psr\Log\LogLevel;
+use spacecatninja\imagerx\exceptions\ImagerException;
 use spacecatninja\imagerx\models\BaseTransformedImageModel;
+use spacecatninja\imagerx\services\ImagerService;
 use spacecatninja\imagerx\transformers\TransformerInterface;
 
 class Gumlet extends Component implements TransformerInterface
@@ -17,6 +20,70 @@ class Gumlet extends Component implements TransformerInterface
      */
     public function transform(Asset|string $image, array $transforms): ?array
     {
-        Craft::getLogger()->log("Asset caught: $image->filename ($image->id)", LogLevel::INFO, 'gumlet-transformer');
+        # We don't support URL images because they have to exist on AWS
+        if (is_string($image)) return [];
+
+        $transformedImages = [];
+
+        foreach ($transforms as $transform) {
+            $transformedImages[] = $this->getTransformedImage($image, $transform);
+        }
+
+        return $transformedImages;
+    }
+
+    private function getTransformedImage(Asset|string $image, array $transform): BaseTransformedImageModel
+    {
+        /** @var Settings $settings */
+        $settings = GumletTransformer::$plugin->getSettings();
+        $config = ImagerService::getConfig();
+
+        if (empty($settings->baseUrl)) throw new ImagerException("No baseUrl defined for Gumlet transformer");
+
+        $urlSegments = [rtrim($settings->baseUrl, "/"), $image->fs->subfolder, $image->path];
+        $url = implode('/', $urlSegments);
+
+        $query = [];
+
+        if (isset($transform['format'])) {
+            $query['format'] = $transform['format'];
+            if ($transform['format'] === 'jpg' && isset($transform['jpegQuality'])) {
+                $query['quality'] = $transform['jpegQuality'];
+            }
+        }
+
+        if (isset($transform['mode'])) {
+            if ($transform['mode'] === 'letterbox') {
+                $query['mode'] = 'fill';
+                if (isset($transform['letterbox']['color'])) {
+                    $query['fill'] = 'solid';
+                    $query['fill-color'] = $transform['letterbox']['color'];
+                }
+            } else {
+                $query['mode'] = $transform['mode'];
+            }
+        }
+
+        if (isset($transform['ratio'])) {
+            $query['mode'] = 'crop';
+            $query['ar'] = $transform['ratio'];
+        }
+        if (isset($transform['width'])) {
+            $query['width'] = $transform['width'];
+        }
+        if (isset($transform['height'])) {
+            $query['height'] = $transform['height'];
+        }
+        if (isset($transform['position']) && is_string($transform['position'])) {
+            [$x, $y] = explode(' ', $transform['position']);
+            $query['mode'] = 'crop';
+            $query['crop'] = 'focalpoint';
+            $query['fp-x'] = $x;
+            $query['fp-y'] = $y;
+        }
+
+        $url .= '?' . http_build_query($query);
+
+        return new GumletTransformedImageModel($url, $image, $transform);
     }
 }
