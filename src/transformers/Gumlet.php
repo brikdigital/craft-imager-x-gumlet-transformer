@@ -40,7 +40,13 @@ class Gumlet extends Component implements TransformerInterface
 
         if (empty($settings->subdomain)) throw new ImagerException("No subdomain defined for Gumlet transformer");
 
-        $urlSegments = ["https://$settings->subdomain.gumlet.io", $image->fs->subfolder, $image->path];
+        $urlSegments = [
+            $settings->customDomain !== ''
+                ? "https://$settings->customDomain"
+                : "https://$settings->subdomain.gumlet.io",
+            $image->fs->subfolder,
+            $image->path
+        ];
         $url = implode('/', $urlSegments);
 
         $query = [];
@@ -82,7 +88,14 @@ class Gumlet extends Component implements TransformerInterface
             $query['fp-y'] = $y;
         }
 
-        $url .= '?' . http_build_query($query);
+        if ($settings->signingKey !== '') {
+            $unsigned = implode('/', [$settings->signingKey, $image->fs->subfolder, $image->path]);
+            $params = http_build_query($query);
+            $hash = md5($unsigned . '?' . $params);
+            $url .= '?' . $params . '&s=' . $hash;
+        } else {
+            $url .= '?' . http_build_query($query);
+        }
 
         return new GumletTransformedImageModel($url, $image, $transform);
     }

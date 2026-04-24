@@ -11,7 +11,8 @@
     name: "subdomain",
     suggestEnvVars: true,
     value: settings.subdomain,
-    required: true
+    required: true,
+    errors: settings.getErrors('subdomain')
 }) }}
 
 {{ forms.autosuggestField({
@@ -19,12 +20,32 @@
     name: "apiKey",
     suggestEnvVars: true,
     value: settings.apiKey,
-    required: true
+    required: true,
+    errors: settings.getErrors('apiKey')
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Custom Domain',
+    name: 'customDomain',
+    suggestEnvVars: true,
+    value: settings.customDomain,
+    required: false,
+    errors: settings.getErrors('customDomain')
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Signing Key',
+    name: 'signingKey',
+    suggestEnvVars: true,
+    value: settings.signingKey,
+    required: false,
+    errors: settings.getErrors('signingKey')
 }) }}
 
 {{ forms.checkbox({
     label: "Use Gumlet in Control Panel",
     name: "hookCpImages",
     checked: settings.hookCpImages,
-    required: false
+    required: false,
+    errors: settings.getErrors('hookCpImages')
 }) }}
