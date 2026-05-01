@@ -2,10 +2,24 @@
 
 namespace brikdigital\gumlettransformer\helpers;
 
+use brikdigital\gumlettransformer\GumletTransformer;
+use brikdigital\gumlettransformer\models\Settings;
+use craft\elements\Asset;
 use craft\models\ImageTransform;
 
 class GumletHelpers
 {
+    public static function getSignedUrl(string $url, Asset $image, array $query): string
+    {
+        /** @var Settings $settings */
+        $settings = GumletTransformer::$plugin->getSettings();
+
+        $unsigned = implode('/', [$settings->signingKey, $image->fs->subfolder, $image->path]);
+        $params = http_build_query($query);
+        $hash = md5($unsigned . '?' . $params);
+        return $url . '?' . $params . '&s=' . $hash;
+    }
+
     /**
      * @see https://github.com/akbansa/craft-gumlet-imagetransformer/blob/15e40984ce22ddbb701ea40e833f25f20816dc14/src/services/Gumlet.php#L185
      */

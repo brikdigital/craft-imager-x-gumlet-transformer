@@ -3,6 +3,7 @@
 namespace brikdigital\gumlettransformer\transformers;
 
 use brikdigital\gumlettransformer\GumletTransformer;
+use brikdigital\gumlettransformer\helpers\GumletHelpers;
 use brikdigital\gumlettransformer\models\GumletTransformedImageModel;
 use brikdigital\gumlettransformer\models\Settings;
 use craft\base\Component;
@@ -89,10 +90,7 @@ class Gumlet extends Component implements TransformerInterface
         }
 
         if ($settings->signingKey !== '') {
-            $unsigned = implode('/', [$settings->signingKey, $image->fs->subfolder, $image->path]);
-            $params = http_build_query($query);
-            $hash = md5($unsigned . '?' . $params);
-            $url .= '?' . $params . '&s=' . $hash;
+            $url = GumletHelpers::getSignedUrl($url, $image, $query);
         } else {
             $url .= '?' . http_build_query($query);
         }

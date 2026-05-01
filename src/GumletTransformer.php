@@ -55,19 +55,33 @@ class GumletTransformer extends Plugin {
                 function (DefineAssetUrlEvent $event) {
                     if (!Craft::$app->request->isCpRequest) return;
 
-                    /** @var Asset $asset */
-                    $asset = $event->sender;
+                    /** @var Asset $image */
+                    $image = $event->sender;
                     $transform = $event->transform;
+                    /** @var Settings $settings */
+                    $settings = GumletTransformer::$plugin->getSettings();
 
-                    $baseUrl = $asset->volume->fs->subfolder . '/' . $asset->path;
+                    $urlSegments = [
+                        $settings->customDomain !== ''
+                            ? "https://$settings->customDomain"
+                            : "https://$settings->subdomain.gumlet.io",
+                        $image->fs->subfolder,
+                        $image->path
+                    ];
+                    $url = implode('/', $urlSegments);
                     $params = GumletHelpers::buildParams($transform);
 
                     if (empty($params)) {
-                        $event->url = $baseUrl;
+                        $event->url = $url;
                         return;
                     }
 
-                    $event->url =  "https://{$this->getSettings()->subdomain}.gumlet.io/$baseUrl?" . http_build_query($params);
+                    if ($settings->signingKey !== '') {
+                        $event->url = GumletHelpers::getSignedUrl($url, $image, $params);
+                    } else {
+                        $event->url = "$url?" . http_build_query($params);
+                    }
+
                     $event->handled = true;
                 }
             );
