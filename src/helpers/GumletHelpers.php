@@ -69,7 +69,7 @@ class GumletHelpers
 
             // Format
             if (!empty($transform->format)) {
-                $mappedFormat = $this->mapFormat($transform->format);
+                $mappedFormat = self::mapFormat($transform->format);
                 if ($mappedFormat !== null) {
                     $params['f'] = $mappedFormat;
                 }
@@ -90,5 +90,28 @@ class GumletHelpers
         return array_filter($params, function ($value) {
             return $value !== null && $value !== '';
         });
+    }
+
+    /**
+     * @see https://github.com/akbansa/craft-gumlet-imagetransformer/blob/15e40984ce22ddbb701ea40e833f25f20816dc14/src/services/Gumlet.php#L271
+     */
+    protected static function mapFormat(?string $format): ?string
+    {
+        if (!$format) {
+            return null;
+        }
+
+        $map = [
+            'jpg' => 'jpg',
+            'jpeg' => 'jpg',
+            'png' => 'png',
+            'gif' => 'gif',
+            'webp' => 'webp',
+            'avif' => 'avif',
+        ];
+
+        $format = strtolower($format);
+
+        return $map[$format] ?? $format;
     }
 }
