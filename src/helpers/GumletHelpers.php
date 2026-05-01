@@ -9,7 +9,7 @@ class GumletHelpers
     /**
      * @see https://github.com/akbansa/craft-gumlet-imagetransformer/blob/15e40984ce22ddbb701ea40e833f25f20816dc14/src/services/Gumlet.php#L185
      */
-    public function buildParams(ImageTransform|array|null $transform, array $additionalParams = []): array
+    public static function buildParams(ImageTransform|array|null $transform, array $additionalParams = []): array
     {
         $params = [];
 
