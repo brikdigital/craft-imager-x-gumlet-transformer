@@ -12,6 +12,7 @@ use craft\base\Plugin;
 use craft\elements\Asset;
 use craft\events\DefineAssetUrlEvent;
 use craft\events\ModelEvent;
+use craft\helpers\App;
 use craft\log\MonologTarget;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
@@ -61,10 +62,14 @@ class GumletTransformer extends Plugin {
                     /** @var Settings $settings */
                     $settings = GumletTransformer::$plugin->getSettings();
 
+                    $subdomain = App::parseEnv($settings->subdomain);
+                    $customDomain = App::parseEnv($settings->customDomain);
+                    $signingKey = App::parseEnv($settings->signingKey);
+
                     $urlSegments = [
-                        $settings->customDomain !== ''
-                            ? "https://$settings->customDomain"
-                            : "https://$settings->subdomain.gumlet.io",
+                        $customDomain !== ''
+                            ? "https://$customDomain"
+                            : "https://$subdomain.gumlet.io",
                         $image->fs->subfolder,
                         $image->path
                     ];
@@ -76,7 +81,7 @@ class GumletTransformer extends Plugin {
                         return;
                     }
 
-                    if ($settings->signingKey !== '') {
+                    if ($signingKey !== '') {
                         $event->url = GumletHelpers::getSignedUrl($url, $image, $params);
                     } else {
                         $event->url = "$url?" . http_build_query($params);
@@ -96,14 +101,17 @@ class GumletTransformer extends Plugin {
                 /** @var Settings $settings */
                 $settings = $this->getSettings();
 
+                $subdomain = App::parseEnv($settings->subdomain);
+                $apiKey = App::parseEnv($settings->apiKey);
+
                 if ($asset->kind !== 'image') {
                     return;
                 }
 
                 $imagePath = $asset->volume->fs->subfolder . '/' . $asset->path;
                 Craft::$app->queue->push(new PurgeGumletCacheJob([
-                    'gumletSubdomain' => $settings->subdomain,
-                    'apiKey' => $settings->apiKey,
+                    'gumletSubdomain' => $subdomain,
+                    'apiKey' => $apiKey,
                     'imagePath' => $imagePath,
                 ]));
             }
