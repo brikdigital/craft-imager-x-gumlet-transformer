@@ -8,6 +8,7 @@ use brikdigital\gumlettransformer\models\GumletTransformedImageModel;
 use brikdigital\gumlettransformer\models\Settings;
 use craft\base\Component;
 use craft\elements\Asset;
+use craft\helpers\App;
 use spacecatninja\imagerx\exceptions\ImagerException;
 use spacecatninja\imagerx\models\BaseTransformedImageModel;
 use spacecatninja\imagerx\services\ImagerService;
@@ -39,12 +40,16 @@ class Gumlet extends Component implements TransformerInterface
         $settings = GumletTransformer::$plugin->getSettings();
         $config = ImagerService::getConfig();
 
-        if (empty($settings->subdomain)) throw new ImagerException("No subdomain defined for Gumlet transformer");
+        $subdomain = App::parseEnv($settings->subdomain);
+        $customDomain = App::parseEnv($settings->customDomain);
+        $signingKey = App::parseEnv($settings->signingKey);
+
+        if (empty($subdomain)) throw new ImagerException("No subdomain defined for Gumlet transformer");
 
         $urlSegments = [
-            $settings->customDomain !== ''
-                ? "https://$settings->customDomain"
-                : "https://$settings->subdomain.gumlet.io",
+            $customDomain !== ''
+                ? "https://$customDomain"
+                : "https://$subdomain.gumlet.io",
             $image->fs->subfolder,
             $image->path
         ];
@@ -89,7 +94,7 @@ class Gumlet extends Component implements TransformerInterface
             $query['fp-y'] = $y;
         }
 
-        if ($settings->signingKey !== '') {
+        if ($signingKey !== '') {
             $url = GumletHelpers::getSignedUrl($url, $image, $query);
         } else {
             $url .= '?' . http_build_query($query);

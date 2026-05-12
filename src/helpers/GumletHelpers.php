@@ -5,6 +5,7 @@ namespace brikdigital\gumlettransformer\helpers;
 use brikdigital\gumlettransformer\GumletTransformer;
 use brikdigital\gumlettransformer\models\Settings;
 use craft\elements\Asset;
+use craft\helpers\App;
 use craft\models\ImageTransform;
 
 class GumletHelpers
@@ -13,8 +14,9 @@ class GumletHelpers
     {
         /** @var Settings $settings */
         $settings = GumletTransformer::$plugin->getSettings();
+        $signingKey = App::parseEnv($settings->signingKey);
 
-        $unsigned = implode('/', [$settings->signingKey, $image->fs->subfolder, $image->path]);
+        $unsigned = implode('/', [$signingKey, $image->fs->subfolder, $image->path]);
         $params = http_build_query($query);
         $hash = md5($unsigned . '?' . $params);
         return $url . '?' . $params . '&s=' . $hash;
