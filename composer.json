@@ -25,7 +25,8 @@
     "require": {
         "php": "^8.0",
         "craftcms/cms": "^5.0.0",
-        "spacecatninja/imager-x": "^5.2"
+        "spacecatninja/imager-x": "^5.2",
+        "craftcms/aws-s3": "^2"
     },
     "autoload": {
         "psr-4": {

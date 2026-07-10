@@ -62,6 +62,9 @@ class GumletTransformer extends Plugin {
                     /** @var Settings $settings */
                     $settings = GumletTransformer::$plugin->getSettings();
 
+                    // We only support S3 filesystems
+                    if ($image->fs::class !== \craft\awss3\Fs::class) return;
+
                     $subdomain = App::parseEnv($settings->subdomain);
                     $customDomain = App::parseEnv($settings->customDomain);
                     $signingKey = App::parseEnv($settings->signingKey);
