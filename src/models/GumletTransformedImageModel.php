@@ -3,6 +3,9 @@
 namespace brikdigital\gumlettransformer\models;
 
 use craft\elements\Asset;
+use craft\models\ImageTransform;
+use ReflectionClass;
+use ReflectionProperty;
 use spacecatninja\imagerx\models\BaseTransformedImageModel;
 use spacecatninja\imagerx\models\TransformedImageInterface;
 use spacecatninja\imagerx\services\ImagerService;
@@ -39,12 +42,11 @@ class GumletTransformedImageModel extends BaseTransformedImageModel implements T
             }
 
             // unset unsupported properties
-            unset(
-                $transform['jpegQuality'],
-                $transform['pngCompressionLevel'],
-                $transform['webpQuality'],
-                $transform['fillInterval'],
+            $reflection = new ReflectionClass(ImageTransform::class);
+            $allowedKeys = array_flip(
+                array_map(fn(ReflectionProperty $property) => $property->getName(), $reflection->getProperties())
             );
+            $transform = array_intersect_key($transform, $allowedKeys);
 
             $this->transform = $transform;
             $this->width = $source->getWidth($transform);
